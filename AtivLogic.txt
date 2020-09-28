@@ -1,0 +1,384 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include<locale.h>
+
+typedef struct{
+	char *element;
+	int size;
+}STRING;
+
+void startScreen();
+void correction(int);
+int secondaryScreen();
+int again();
+void rules();
+void readString(STRING *);
+int stringAlphabet(STRING *);
+int stringBegin(STRING *);
+int stringConnectives(STRING *);
+int stringNumberOfParentheses(STRING *); 
+int stringSequence(STRING *);
+int stringOneElement(STRING *);
+void end();
+
+main(){
+	setlocale(LC_ALL, "Portuguese");
+	STRING str;
+	int  a = 1, b = 1;
+	char c;
+	startScreen();
+	while(b){
+		switch(secondaryScreen()){
+			case 1:{
+				while(a){
+					setbuf(stdin,NULL);
+					readString(&str);
+					if(stringAlphabet(&str)){
+						if(stringBegin(&str)){
+							if(stringConnectives(&str)){
+								if(stringNumberOfParentheses(&str)){
+									if(stringSequence(&str)){
+										if(stringOneElement(&str)){
+											a = again();
+										}
+										else{
+											system("cls");
+											printf("   |=|====================================================================|=|\n");
+											printf("   | |  Não é uma FBF! Digite novamente!                                  | |\n");
+										}
+									}
+									else{
+										system("cls");
+										printf("   |=|====================================================================|=|\n");
+										printf("   | |  Não é uma FBF! Digite novamente!                                  | |\n");
+									}
+								}
+								else{
+									system("cls");
+									printf("   |=|====================================================================|=|\n");
+									printf("   | |  Não é uma FBF! Problema na quantidade de Parênteses!              | |\n");
+								}
+							}
+							else{
+								system("cls");
+								printf("   |=|====================================================================|=|\n");
+								printf("   | |  Caractere inválido! Digite novamente!                             | |\n");
+							}
+						}
+						else{
+							system("cls");
+							printf("   |=|====================================================================|=|\n");
+							printf("   | |  Não é uma FBF! Digite novamente!                                  | |\n");
+						}
+					}
+					else{
+						system("cls");
+						printf("   |=|====================================================================|=|\n");
+						printf("   | |  Caractere inválido! Digite novamente!                             | |\n");
+					}
+						
+					
+				}
+				break;
+			}
+				
+			case 2:{
+				rules();
+				system("cls");
+				break;
+			}
+			
+			case 3:{
+				system("cls");
+				end();
+				exit (5);
+				break;
+			}
+		}
+		system("cls");
+		setbuf(stdin,NULL);
+ 	}
+ 
+}
+
+void readString(STRING *str){
+	str->element = (char*)malloc(sizeof(char)*101);
+	if(!str->element){
+		printf("Não foi possível criar essa string!");
+		exit(1);
+	}
+	printf("   |=|====================================================================|=|\n");
+	printf("   |=|====================================================================|=|\n");
+	printf("   | | Entre com a Fórmula                                                | |\n");
+	printf("   | | -->                                                                | |\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
+	scanf("%[^\n]", str->element);
+	str->size = strlen(str->element);
+}
+
+int stringAlphabet(STRING *str){
+	int i, j, R /*Return*/;
+	char helper[] = {40, 41, 124, 60, 45, 62, 126, 94};
+	/*              "(" ")"  "|" "<" "-" ">"  "~"  "^"*/
+	
+	for(i=0; i<str->size; i++){
+		R = 0;
+		for(j=0;j<8; j++){
+			if((str->element[i] == helper[j]) || (str->element[i]>64 && str->element[i]<91) || (str->element[i] == 102) || (str->element[i] == 116)){
+				R=1;
+				break;
+			}	
+		}
+		if(R == 0)
+			break;
+	}
+	return R;
+}
+
+int stringBegin(STRING *str){
+	int i, R = 1;
+	char helper[] = {124, 60, 45, 62, 41, 94};
+/*              	 "|" "<" "-" ">" ")" "^"*/
+	for(i=0;i<6;i++)
+		if(str->element[0] == helper[i]){
+					R = 0;
+					break;		
+		}
+	return R;
+}
+
+int stringConnectives(STRING *str){
+	int i, j, R = 1;
+	char helper[] = {40, 41, 124, 60, 45, 62};
+	/*              "(" ")"  "|" "<" "-" ">"  */
+	
+	for(i=0; i<str->size;i++){
+		//Bi-Implicação <->
+		if(str->element[i] == 60){
+			i++;
+			if(str->element[i] == 45){
+				i++;
+				if(str->element[i] == 62){
+					i++;
+					R = 1;
+					continue;
+				}
+				else{
+					R = 0;
+					break;
+				}
+			}
+			else{
+				R = 0;
+				break;
+			}
+				
+		}
+		
+		//Implicação ->
+		if(str->element[i] == 45){
+			i++;
+			if(str->element[i] == 62){
+				R = 1;
+				continue;
+			}
+			else{
+				R = 0;
+				break;
+			}
+		}
+	}
+	return R;
+}
+
+int stringNumberOfParentheses(STRING *str){
+	int i, R = 0;
+	char helper[] = {40, 41};
+/*                  "(" ")"  */
+	for(i=0;i<str->size;i++){
+		if(str->element[i] == 40){
+			R++;
+			continue;
+		}
+		if(str->element[i] == 41){
+			R--;
+			continue;
+		}
+	}
+	
+	if(!R)
+		return 1;
+	else
+		return 0;
+		
+	
+}
+
+int stringSequence(STRING *str){
+	int i, j, R, g;
+	char helper[] = {124, 60, 45, 62, 40, 126, 94};
+/*              	 "|" "<" "-" ">" "("  "~" "^"*/
+	
+	for(i=0;i<str->size;i++){
+		R = 1;
+		//Parênteses )(
+		if(str->element[i] == 41)
+			if(str->element[i+1] == 40){
+				R = 0;
+				break;
+			}
+			
+		//Parênteses ()
+		if(str->element[i] == 40)
+			if(str->element[i+1] == 41){
+				R = 0;
+				break;
+			}
+		
+		//Letras
+		if(str->element[i]>64 && str->element[i]<91)
+			if((str->element[i+1]>64 && str->element[i+1]<91) || (str->element[i] == 102) || (str->element[i] == 116)){
+				R = 0;
+				break;
+			}
+		
+		//Negação ~
+		if(str->element[i] == 126 && str->size > 1)
+			for(j=0;j<7;j++){
+				if(str->element[i+1] == helper[j]){
+					R = 0;
+					break;
+				}
+			}
+	
+		//Último elemento
+		for(i=0;i<7;i++){
+			if(str->element[str->size-1] == helper[i]){
+				R = 0;
+				break;
+			}
+		}
+	}
+	
+	//Parênteses (A)A
+	for(i=0;i<str->size;i++)
+		if((str->element[i] == 41) && (str->element[i+1]>64 && str->element[i+1]<91)){
+				R = 0;
+				break;		
+		}
+	
+	return R;
+}
+
+int stringOneElement(STRING *str){
+	int R = 1;
+	
+	if(str->size == 1)
+		if(!(str->element[0]>64 && str->element[0]<91) && !(str->element[0] == 102) && !(str->element[0] == 116))
+			R = 0;
+			
+	return R;
+}
+
+
+void startScreen(){
+	char s;
+	printf("   |=|====================================================================|=|\n");
+	printf("   |=|====================================================================|=|\n");
+	printf("   | |                                                                    | |\n");
+	printf("   | |                                                                    | |\n");
+	printf("   | |                                                                    | |\n");
+	printf("   | |                                                                    | |\n");
+	printf("   | |                       Lógica para Computação                       | |\n");	
+	printf("   | |                                                                    | |\n");	
+	printf("   | |                                                                    | |\n");	
+	printf("   | |                                                                    | |\n");	
+	printf("   | |                                                                    | |\n");						
+	printf("   | |                --> Pressione ENTER para começar <--                | |\n");						
+	printf("   | |                                                                    | |\n");				
+	printf("   | |                                                                    | |\n");						
+	printf("   | |                                                                    | |\n");						
+	printf("   | |                                                                    | |\n");						
+	printf("   | |                                                                    | |\n");	
+	printf("   | |                                                                    | |\n");													
+	printf("   | |                          By Carlos Lamark                          | |\n");													
+	printf("   |=|====================================================================|=|\n");										
+	printf("   |=|====================================================================|=|\n");			
+	scanf("%c", &s);
+	system("cls");
+	setbuf(stdin,NULL);																																		
+}
+
+int secondaryScreen(){
+	int a;
+	printf("   |=|====================================================================|=|\n");
+	printf("   |=|====================================================================|=|\n");
+	printf("   | |                   -->Digite o número da opção<--                   | |\n");
+	printf("   | |                                                                    | |\n");	
+	printf("   | |  [1]Testar Fórmula                                                 | |\n");
+	printf("   | |  [2]Regras de como usar                                            | |\n");
+	printf("   | |  [3]Finalizar programa                                             | |\n");
+	printf("   | |                                                                    | |\n");
+	printf("   |=|================================> <=================================|=|\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
+	scanf("%d", &a);
+	system("cls");
+	return a;
+}
+
+int again(){
+	int a;
+	printf("   | |                                                                    | |\n");
+	printf("   | | Isso é uma FBF!                                                    | |\n");	
+	printf("   | |                                                                    | |\n");
+	printf("   | | [1]Realizar novamente                                              | |\n");
+	printf("   | | [0]Voltar para a tela de escolhas                                  | |\n");
+	printf("   |=|================================> <=================================|=|\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
+	scanf("%d", &a);
+	system("cls");
+	return a;
+}
+
+void rules(){
+	char c;
+	setbuf(stdin, NULL);
+	printf("   |=|====================================================================|=|\n");
+	printf("   |=|====================================================================|=|\n");
+	printf("   | |                              REGRAS                                | |\n");
+	printf("   | | #Somente letras maiúsculas                                         | |\n");
+	printf("   | | #True = t                                                          | |\n");
+	printf("   | | #False = f                                                         | |\n");
+	printf("   | | #Conectivos: ->   <->   |   ~   ^                                  | |\n");
+	printf("   | |                                                                    | |\n");
+	printf("   | |                     ENTER para sair das Regras                     | |\n");
+	printf("   |=|====================================================================|=|\n");
+	printf("   |=|====================================================================|=|\n");
+	scanf("%c", &c);
+	setbuf(stdin, NULL);
+}
+
+void end(){
+	printf("   |=|====================================================================|=|\n");
+	printf("   |=|====================================================================|=|\n");
+	printf("   | |                                                                    | |\n");
+	printf("   | |                   ________   __    __    _______                   | |\n");
+	printf("   | |                  |___  ___| |  |  |  |  |  _____|                  | |\n");
+	printf("   | |                     |  |    |  |__|  |  | |_____                   | |\n");
+	printf("   | |                     |  |	   |   __   |  |  _____|                  | |\n");
+	printf("   | |                     |  |    |  |  |  |  | |_____                   | |\n");
+	printf("   | |                     |__|    |__|  |__|  |_______|                  | |\n");
+	printf("   | |                   _______    ___    _    ______                    | |\n");
+	printf("   | |                  |  _____|  |   \\  | |  |  __  \\                   | |\n");
+	printf("   | |                  | |_____   | |\\ \\ | |  | |  \\  \\                  | |\n");
+	printf("   | |                  |  _____|  | | \\ \\| |  | |  |  |                  | |\n");
+	printf("   | |                  | |_____   | |  \\   |  | |__/  /                  | |\n");
+	printf("   | |                  |_______|  |_|   \\__|  |______/                   | |\n");
+	printf("   | |                                                                    | |\n");
+	printf("   | |                                                                    | |\n");
+	printf("   |=|====================================================================|=|\n");
+	printf("   |=|====================================================================|=|\n");
+}
+
+
+
+ 
+ 
